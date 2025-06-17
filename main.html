@@ -1,13 +1,82 @@
 <!DOCTYPE html>
-
-<html>
-  <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css" />
-  </head>
-
-  <body>
-    <!-- the entire body must be written by student -->
+    <title>Image Downloader</title>
+    <style>
+        /* CSS for loading spinner and error message */
+        #loading {
+            display: none;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        #error {
+            color: red;
+            margin-bottom: 20px;
+        }
+        #output img {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Loading...</div>
+    <div id="error"></div>
     <div id="output"></div>
-    <script type="text/javascript" src="./script.js"></script>
-  </body>
+    <button id="download-images-button">Download Images</button>
+    
+    <script type="text/javascript">
+        const output = document.getElementById("output");
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+
+        const imageUrls = [
+            'https://picsum.photos/id/237/200/300',
+            'https://picsum.photos/id/238/200/300',
+            'https://picsum.photos/id/239/200/300'
+        ];
+
+        function downloadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = url;
+                
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(`Failed to load image at ${url}`);
+            });
+        }
+
+        function downloadImages(imageUrls) {
+            // Show loading spinner
+            loadingDiv.style.display = 'block';
+            errorDiv.innerText = ''; // Clear previous errors
+            output.innerHTML = ''; // Clear previous images
+
+            // Start downloading images
+            Promise.all(imageUrls.map(downloadImage))
+                .then(images => {
+                    // Hide loading spinner
+                    loadingDiv.style.display = 'none';
+                    
+                    // Display all images
+                    images.forEach(img => {
+                        output.appendChild(img);
+                    });
+                })
+                .catch(error => {
+                    // Hide loading spinner
+                    loadingDiv.style.display = 'none';
+                    
+                    // Display error message
+                    errorDiv.innerText = error;
+                });
+        }
+
+        document.getElementById("download-images-button").addEventListener("click", () => {
+            downloadImages(imageUrls);
+        });
+    </script>
+</body>
 </html>
